@@ -5,7 +5,7 @@ lore-durability:
 lore-attribute-breakable: '&9· &fCan be mined with Silk Touch'
 lore-attribute-changeable: '&9· &fSpawn type can be changed with Spawn Egg'
 
-display-name: '&Unstable Spawner'
+display-name: '&dUnstable Spawner'
 display-name-deny-break: '&eSpawner'
 
 message-reload: '&aReloaded successfully!'

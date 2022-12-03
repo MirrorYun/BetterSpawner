@@ -1,0 +1,22 @@
+lore-type: '&6&l{type}'
+lore-durability:
+  - '&7Durability: {progress-bar}'
+  - '&8             ({durability} / {maxDurability})'
+lore-attribute-breakable: '&9· &fCan be mined with Silk Touch'
+lore-attribute-changeable: '&9· &fSpawn type can be changed with Spawn Egg'
+
+display-name: '&Unstable Spawner'
+display-name-deny-break: '&eSpawner'
+
+message-reload: '&aReloaded successfully!'
+message-must-be-int: '&c{value} must be an integer!'
+message-entity-not-found: '&cEntity type {entity} not found!'
+message-player-not-found: '&cPlayer {player} not found!'
+message-give-success: '&aSuccessfully gave &l{player}&a &l{amount}&a {item}&a!'
+
+message-denied-place: '&cYou cannot place this spawner!'
+message-denied-change: '&cYou cannot change the spawner type to {entity}!'
+message-denied-change-spawner: '&cYou cannot change type of this spawner!'
+
+# available variables: {durability} {maxDurability} {displayName} {entity}
+spawner-hologram: '&aRemaining durability: &l{durability}'

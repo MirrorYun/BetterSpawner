@@ -1,0 +1,17 @@
+name: BetterSpawner
+version: '${project.version}'
+main: com.hyun.betterspawner.BetterSpawner
+api-version: 1.19
+authors: [ Hyun ]
+permissions:
+  betterspawner.bypass:
+    default: op
+    description: 绕过天然无限制刷怪笼放置限制
+  betterspawner.admin:
+    default: op
+    description: 使用管理员指令
+commands:
+  betterspawner:
+    usage: "§e§l== BetterSpawner ==\n§f/<command> reload\n§f/<command> give <player> [entity type] [amount] [durability] [flags]"
+    description: BetterSpawner
+    permission: betterspawner.admin

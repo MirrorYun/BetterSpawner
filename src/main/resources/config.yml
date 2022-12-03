@@ -1,0 +1,37 @@
+# 所有配置的实体类型见以下链接
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+
+# 可用翻译 cn / en
+language: cn
+
+# TNT 天然刷怪笼炸落几率
+drop-chance: 0.1
+
+# 天然掉落刷怪笼属性
+# 1: 不可挖掘
+# 2: 不可更改刷怪类型
+
+# 若想同时设置多个属性需要相加到一起
+# 例如: 3 为 不可挖掘 + 不可更改刷怪类型 (1 + 2 = 3)
+drop-flags: 0
+
+# 刷怪笼默认耐久值
+durability: 1000
+
+# 刷出一个实体扣除的耐久值，未配置默认扣 1
+entity-ratio:
+  FOX: 5
+  CAT: 5
+  PANDA: 10
+  PIG: 2
+  COW: 2
+  SHEEP: 2
+
+# 允许玩家使用刷怪蛋改变的类型
+allow-change:
+  - PIG
+  - COW
+  - SHEEP
+  - FOX
+  - CAT
+  - PANDA

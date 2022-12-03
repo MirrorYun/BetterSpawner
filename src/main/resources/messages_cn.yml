@@ -1,0 +1,22 @@
+lore-type: '&6&l{type} &6类型'
+lore-durability:
+  - '&7耐久: {progress-bar}'
+  - '&8        ({durability} / {maxDurability})'
+lore-attribute-breakable: '&9· &f可用精准采集挖掘'
+lore-attribute-changeable: '&9· &f可以用刷怪蛋更改刷怪类型'
+
+display-name: '&d松动的刷怪笼'
+display-name-deny-break: '&e刷怪笼'
+
+message-reload: '&a重载成功！'
+message-must-be-int: '&c{value} 必须是整数！'
+message-entity-not-found: '&c生物类型 {entity} 不存在！'
+message-player-not-found: '&c玩家 {player} 不存在！'
+message-give-success: '&a成功给予 &l{player}&a 共 &l{amount}&a 个 {item}&a！'
+
+message-denied-place: '&c你不能放置这个刷怪笼！'
+message-denied-change: '&c你不能将刷怪笼类型更改为 {entity}！'
+message-denied-change-spawner: '&c你不能修改此刷怪笼类型！'
+
+# available variables: {durability} {maxDurability} {displayName} {entity}
+spawner-hologram: '&a剩余耐久值: &l{durability}'

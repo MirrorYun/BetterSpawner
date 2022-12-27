@@ -1,6 +1,8 @@
 name: BetterSpawner
 version: '${project.version}'
 main: com.hyun.betterspawner.BetterSpawner
+libraries:
+  - org.apache.commons:commons-lang3:3.12.0
 api-version: 1.19
 authors: [ Hyun ]
 permissions:
@@ -12,6 +14,6 @@ permissions:
     description: 使用管理员指令
 commands:
   betterspawner:
-    usage: "§e§l== BetterSpawner ==\n§f/<command> reload\n§f/<command> give <player> [entity type] [amount] [durability] [flags]"
+    usage: "§e§l== BetterSpawner ==\n§f/<command> reload\n§f/<command> give <player> [-t <entity type|nbt>] [-a <amount>] [-d <durability>] [-f <flags>] [-n <display name>]"
     description: BetterSpawner
     permission: betterspawner.admin

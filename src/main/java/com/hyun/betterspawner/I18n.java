@@ -1,10 +1,12 @@
 package com.hyun.betterspawner;
 
+import com.google.common.base.Charsets;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +37,8 @@ public class I18n {
         try {
             plugin.saveResource(lang, false);
         } catch (Exception e) {
-            plugin.saveResource("messages_cn.yml", false);
+            this.lang = "messages_cn.yml";
+            plugin.saveResource(lang, false);
         }
 
         File messageFile = new File(plugin.getDataFolder(), lang);
@@ -43,6 +46,9 @@ public class I18n {
             throw new RuntimeException("Failed to create messages.yml");
         }
         messageData = YamlConfiguration.loadConfiguration(messageFile);
+
+        final var defaults = plugin.getResource(lang);
+        if(defaults != null) messageData.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defaults, Charsets.UTF_8)));
     }
 
     public String message(String key, Map<String, String> replace) {
@@ -56,6 +62,6 @@ public class I18n {
                 return String.join("\n", f((List<String>) messages, replace).stream().toList());
         }
 
-        return "Invalid message type";
+        return "Invalid message type: " + (raw == null? "null": raw.getClass().getSimpleName());
     }
 }

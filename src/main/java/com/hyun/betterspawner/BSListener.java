@@ -1,5 +1,8 @@
 package com.hyun.betterspawner;
 
+import com.hyun.betterspawner.utils.ItemUtil;
+import com.hyun.betterspawner.utils.NBTUtil;
+import com.hyun.betterspawner.utils.nbt.MojangsonParser;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,10 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Listener implements org.bukkit.event.Listener {
+public class BSListener implements org.bukkit.event.Listener {
     private final BetterSpawner plugin;
 
-    public Listener(BetterSpawner plugin) {
+    public BSListener(BetterSpawner plugin) {
         this.plugin = plugin;
     }
 
@@ -61,33 +64,46 @@ public class Listener implements org.bukkit.event.Listener {
         final ConfigurationSection spawnerData = plugin.getSpawnerData().getConfigurationSection(key);
         if(spawnerData == null) return;
 
+        int durability = spawnerData.getInt("durability", 0);
+        int maxDurability = spawnerData.getInt("maxDurability", durability);
+
         Location loc = e.getSpawner().getBlock().getLocation();
 
-        int durability = spawnerData.getInt("durability", 0);
-        final int ratio = plugin.getConfig().getInt("entity-ratio." + e.getEntityType(), 1);
+        if(maxDurability >= 0) {
+            final int ratio = plugin.getConfig().getInt("entity-ratio." + e.getEntityType(), 1);
 
-        durability -= ratio;
+            durability -= ratio;
 
-        if(durability <= 0) {
-            e.getSpawner().getBlock().setType(Material.AIR);
-            ArmorStand armorStand = getSpawnerHologram(loc);
-            if(armorStand != null) armorStand.remove();
-            plugin.getSpawnerData().set(key, null);
-            plugin.saveSpawnerData();
+            if(durability <= 0) {
+                e.getSpawner().getBlock().setType(Material.AIR);
+                ArmorStand armorStand = getSpawnerHologram(loc);
+                if(armorStand != null) armorStand.remove();
+                plugin.getSpawnerData().set(key, null);
+                plugin.saveSpawnerData();
 
-            plugin.getServer().getOnlinePlayers().forEach(p -> {
-                if(p.getLocation().distance(loc) <= 16) {
-                    p.playSound(loc, Sound.ENTITY_ITEM_BREAK, 1, 1);
-                }
-            });
-            return;
+                plugin.getServer().getOnlinePlayers().forEach(p -> {
+                    if(p.getLocation().distance(loc) <= 16) {
+                        p.playSound(loc, Sound.ENTITY_ITEM_BREAK, 1, 1);
+                    }
+                });
+                return;
+            }
+            spawnerData.set("durability", durability);
+
+            // 为了增加效率不再每刷出实体就保存数据，改为插件被卸载后保存
+            // plugin.saveSpawnerData();
         }
 
         e.getEntity().setMetadata("no-punya", new org.bukkit.metadata.FixedMetadataValue(plugin, true));
 
-        spawnerData.set("durability", durability);
-        // 为了增加效率不再每刷出实体就保存数据，改为插件被卸载后保存
-        // plugin.saveSpawnerData();
+        final String hologram = plugin.i18n(maxDurability < 0 ? "spawner-hologram-unlimited": "spawner-hologram", Map.of(
+                "durability", String.valueOf(durability),
+                "maxDurability", String.valueOf(maxDurability),
+                "displayName", ItemUtil.getSpawnerDisplayName(plugin, spawnerData),
+                "entity", e.getEntityType().toString()
+        ));
+
+        if(hologram.isEmpty()) return;
 
         ArmorStand armorStand = getSpawnerHologram(loc);
         if(armorStand == null) {
@@ -102,12 +118,7 @@ public class Listener implements org.bukkit.event.Listener {
             armorStand.getPersistentDataContainer().set(plugin.keySpawnerLoc, PersistentDataType.STRING, key);
         }
 
-        armorStand.setCustomName(plugin.i18n("spawner-hologram", Map.of(
-                "durability", String.valueOf(durability),
-                "maxDurability", String.valueOf(spawnerData.getInt("maxDurability", durability)),
-                "displayName", plugin.i18n((spawnerData.getInt("flags") & 1) == 0 ? "display-name": "display-name-deny-break"),
-                "entity", e.getEntityType().toString()
-        )));
+        armorStand.setCustomName(hologram);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -131,14 +142,25 @@ public class Listener implements org.bukkit.event.Listener {
         EntityType entityType = ((CreatureSpawner) meta.getBlockState()).getSpawnedType();
         final ConfigurationSection spawnerData = new MemoryConfiguration();
         spawnerData.set("type", entityType.toString());
+        spawnerData.set("displayName", meta.getDisplayName());
         spawnerData.set("durability", container.get(plugin.keyDurability, PersistentDataType.INTEGER));
         spawnerData.set("maxDurability", container.get(plugin.keyMaxDurability, PersistentDataType.INTEGER));
         if(container.has(plugin.keyFlags, PersistentDataType.INTEGER))
             spawnerData.set("flags", container.get(plugin.keyFlags, PersistentDataType.INTEGER));
 
         CreatureSpawner state = (CreatureSpawner) e.getBlockPlaced().getState();
-        state.setSpawnedType(entityType);
-        state.update();
+        if(container.has(plugin.keyNBT, PersistentDataType.STRING)) {
+            final var nbt = container.get(plugin.keyNBT, PersistentDataType.STRING);
+            spawnerData.set("nbt", nbt);
+            try {
+                NBTUtil.setTileEntityNBT(state, MojangsonParser.parse(nbt));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            state.setSpawnedType(entityType);
+            state.update();
+        }
 
         plugin.getSpawnerData().set(plugin.getSpawnerDataKey(e.getBlockPlaced().getLocation()), spawnerData);
         plugin.saveSpawnerData();
@@ -160,7 +182,7 @@ public class Listener implements org.bukkit.event.Listener {
 
             if(!denyBreak) {
                 e.setExpToDrop(0);
-                e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), Utils.getSpawnerDropItem(plugin, ((CreatureSpawner) e.getBlock().getState()).getSpawnedType(), spawnerData));
+                e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), ItemUtil.getSpawnerDropItem(plugin, ((CreatureSpawner) e.getBlock().getState()).getSpawnedType(), spawnerData));
             }
         }
 
@@ -243,7 +265,7 @@ public class Listener implements org.bukkit.event.Listener {
 
                     final int defaultDurability = plugin.getConfig().getInt("durability");
                     newSpawnerData.set("durability", defaultDurability);
-                    block.getWorld().dropItemNaturally(block.getLocation(), Utils.getSpawnerDropItem(plugin, spawnerType, newSpawnerData));
+                    block.getWorld().dropItemNaturally(block.getLocation(), ItemUtil.getSpawnerDropItem(plugin, spawnerType, newSpawnerData));
                 }
             } else {
                 final int flags = spawnerData.getInt("flags");
@@ -255,7 +277,7 @@ public class Listener implements org.bukkit.event.Listener {
                 if(armorStand != null) armorStand.remove();
 
                 plugin.getSpawnerData().set(key, null);
-                block.getWorld().dropItemNaturally(block.getLocation(), Utils.getSpawnerDropItem(plugin, spawnerType, spawnerData));
+                block.getWorld().dropItemNaturally(block.getLocation(), ItemUtil.getSpawnerDropItem(plugin, spawnerType, spawnerData));
             }
         });
         plugin.saveSpawnerData();

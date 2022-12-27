@@ -1,5 +1,6 @@
-package com.hyun.betterspawner;
+package com.hyun.betterspawner.utils;
 
+import com.hyun.betterspawner.BetterSpawner;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,8 +13,13 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
-public class Utils {
+public class ItemUtil {
+    public static String getSpawnerDisplayName(BetterSpawner plugin, @Nonnull ConfigurationSection spawnerData) {
+        return spawnerData.getString("displayName", plugin.i18n((spawnerData.getInt("flags") & 1) == 0 ? "display-name": "display-name-deny-break"));
+    }
+
     public static ItemStack getSpawnerDropItem(BetterSpawner plugin, EntityType type, @Nonnull ConfigurationSection spawnerData) {
         return getSpawnerDropItem(plugin, type, spawnerData, 1);
     }
@@ -37,6 +43,8 @@ public class Utils {
         container.set(plugin.keyDurability, PersistentDataType.INTEGER, durability);
         container.set(plugin.keyMaxDurability, PersistentDataType.INTEGER, maxDurability);
         container.set(plugin.keyFlags, PersistentDataType.INTEGER, flags);
+        if(spawnerData.contains("nbt"))
+            container.set(plugin.keyNBT, PersistentDataType.STRING, Objects.requireNonNull(spawnerData.getString("nbt")));
 
         final int percent = (int) (16 * (double) durability / (double)maxDurability);
         final boolean denyBreak = (flags & 1) != 0;
@@ -45,7 +53,7 @@ public class Utils {
         var lore = new ArrayList<String>();
         var attrs = new ArrayList<String>();
 
-        lore.add(plugin.i18n("lore-type", Map.of("type", type.toString())));
+        lore.add(plugin.i18n("lore-type", Map.of("type", spawnerData.contains("nbt") ? "CUSTOM" : type.toString())));
         lore.add("");
 
         if(!denyBreak)
@@ -59,12 +67,12 @@ public class Utils {
             lore.add("");
         }
 
-        lore.addAll(Arrays.stream(plugin.i18n("lore-durability", Map.of("durability", String.valueOf(durability),
+        lore.addAll(Arrays.stream(plugin.i18n(maxDurability < 0 ? "lore-durability-unlimited": "lore-durability", Map.of("durability", String.valueOf(durability),
                 "maxDurability", String.valueOf(maxDurability),
                 "progress-bar", "§a" + "■".repeat(percent) + "§7" + "□".repeat(16 - percent))).split("\n")).toList());
 
         meta.setLore(lore);
-        meta.setDisplayName(plugin.i18n(denyBreak? "display-name-deny-break": "display-name"));
+        meta.setDisplayName(getSpawnerDisplayName(plugin, spawnerData));
         item.setItemMeta(meta);
         return item;
     }

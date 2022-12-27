@@ -1,8 +1,6 @@
 name: BetterSpawner
 version: '${project.version}'
 main: com.hyun.betterspawner.BetterSpawner
-libraries:
-  - org.apache.commons:commons-lang3:3.12.0
 api-version: 1.19
 authors: [ Hyun ]
 permissions:

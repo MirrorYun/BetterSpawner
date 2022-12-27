@@ -4,9 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.ClassUtils;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.*;
@@ -98,8 +95,8 @@ public class ReflectUtil {
      * @return the class instance
      */
     public static ReflectionResponse<Class<?>> getNMSClass(String clazz, String packageName) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(packageName, "packageName cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert packageName != null: "packageName cannot be null";
         return getClass((isVersionHigherOrEqual(1, 17)? packageName: NMS_PACKAGE) + "." + clazz);
     }
 
@@ -112,7 +109,7 @@ public class ReflectUtil {
      * @return the class instance
      */
     public static ReflectionResponse<Class<?>> getCBClass(String clazz) {
-        Validate.notNull(clazz, "clazz cannot be null");
+        assert clazz != null: "clazz cannot be null";
         return getClass(CB_PACKAGE + "." + clazz);
     }
 
@@ -123,7 +120,7 @@ public class ReflectUtil {
      * @return the class instance
      */
     public static ReflectionResponse<Class<?>> getClass(String clazz) {
-        Validate.notNull(clazz, "clazz cannot be null");
+        assert clazz != null: "clazz cannot be null";
         try {
             return new ReflectionResponse<>(Class.forName(clazz));
         } catch (ClassNotFoundException e) {
@@ -140,8 +137,8 @@ public class ReflectUtil {
      * @return the constructor
      */
     public static <T> ReflectionResponse<Constructor<T>> getConstructor(Class<T> clazz, Class<?>... params) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(params, "params cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert params != null: "params cannot be null";
         try {
             return new ReflectionResponse<>(clazz.getConstructor(params));
         } catch (NoSuchMethodException e) {
@@ -157,8 +154,8 @@ public class ReflectUtil {
      * @return the field
      */
     public static ReflectionResponse<Field> getField(Class<?> clazz, String fieldName) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(fieldName, "fieldName cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert fieldName != null: "fieldName cannot be null";
         try {
             return new ReflectionResponse<>(clazz.getField(fieldName));
         } catch (NoSuchFieldException e) {
@@ -186,8 +183,8 @@ public class ReflectUtil {
      * @return the field
      */
     public static ReflectionResponse<Field> getDeclaredField(Class<?> clazz, String fieldName, boolean setAccessible) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(fieldName, "fieldName cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert fieldName != null: "fieldName cannot be null";
         try {
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(setAccessible);
@@ -257,8 +254,8 @@ public class ReflectUtil {
      * @return the field
      */
     public static ReflectionResponse<Field> getFieldByPredicate(Class<?> clazz, Predicate<Field> predicate, int index) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.isTrue(index >= 0, "index cannot be less than zero");
+        assert clazz != null: "clazz cannot be null";
+        assert index >= 0: "index cannot be less than zero";
         int curIndex = 0;
         for (Field field : clazz.getFields()) {
             if (predicate == null || predicate.test(field)) {
@@ -309,8 +306,8 @@ public class ReflectUtil {
      * @return the field
      */
     public static ReflectionResponse<Field> getDeclaredFieldByPredicate(Class<?> clazz, Predicate<Field> predicate, boolean setAccessible, int index) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.isTrue(index >= 0, "index cannot be less than zero");
+        assert clazz != null: "clazz cannot be null";
+        assert index >= 0: "index cannot be less than zero";
         int curIndex = 0;
         for (Field field : clazz.getDeclaredFields()) {
             //noinspection Duplicates
@@ -334,9 +331,9 @@ public class ReflectUtil {
      * @return the method
      */
     public static ReflectionResponse<Method> getMethod(Class<?> clazz, String methodName, Class<?>... params) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(methodName, "methodName cannot be null");
-        Validate.notNull(params, "params cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert methodName != null: "methodName cannot be null";
+        assert params != null: "params cannot be null";
         try {
             return new ReflectionResponse<>(clazz.getMethod(methodName, params));
         } catch (NoSuchMethodException e) {
@@ -399,8 +396,8 @@ public class ReflectUtil {
      * @return the method
      */
     public static ReflectionResponse<Method> getMethodByPredicate(Class<?> clazz, Predicate<Method> predicate, int index) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.isTrue(index >= 0, "index cannot be less than zero");
+        assert clazz != null: "clazz cannot be null";
+        assert index >= 0: "index cannot be less than zero";
         int curIndex = 0;
         for (Method method : clazz.getMethods()) {
             if (predicate == null || predicate.test(method)) {
@@ -435,9 +432,9 @@ public class ReflectUtil {
      * @return the method
      */
     public static ReflectionResponse<Method> getDeclaredMethod(Class<?> clazz, String name, boolean setAccessible, Class<?>... params) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.notNull(name, "name cannot be null");
-        Validate.notNull(params, "params cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert name != null: "name cannot be null";
+        assert params != null: "params cannot be null";
         try {
             Method method = clazz.getDeclaredMethod(name, params);
             method.setAccessible(setAccessible);
@@ -488,8 +485,8 @@ public class ReflectUtil {
      * @return the field
      */
     public static ReflectionResponse<Method> getDeclaredMethodByPredicate(Class<?> clazz, Predicate<Method> predicate, int index, boolean setAccessible) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.isTrue(index >= 0, "index cannot be less than zero");
+        assert clazz != null: "clazz cannot be null";
+        assert index >= 0: "index cannot be less than zero";
         int curIndex = 0;
         for (Method method : clazz.getDeclaredMethods()) {
             //noinspection Duplicates
@@ -512,8 +509,8 @@ public class ReflectUtil {
      * @return the value
      */
     public static ReflectionResponse<Object> getFieldValue(Object object, Field field) {
-        Validate.notNull(field, "field cannot be null");
-        Validate.isTrue(object != null || Modifier.isStatic(field.getModifiers()), "object cannot be null");
+        assert field != null: "field cannot be null";
+        assert object != null || Modifier.isStatic(field.getModifiers()): "object cannot be null";
         try {
             return new ReflectionResponse<>(field.get(object));
         } catch (IllegalAccessException e) {
@@ -529,9 +526,9 @@ public class ReflectUtil {
      * @return the constant
      */
     public static ReflectionResponse<Object> getEnumConstant(Class<?> clazz, String constant) {
-        Validate.notNull(clazz, "clazz cannot be null");
-        Validate.isTrue(clazz.isEnum(), "clazz is not an Enum");
-        Validate.notNull(constant, "constant cannot be null");
+        assert clazz != null: "clazz cannot be null";
+        assert clazz.isEnum(): "clazz is not an Enum";
+        assert constant != null: "constant cannot be null";
         try {
             Field field = clazz.getField(constant);
             return new ReflectionResponse<>(field.get(null));
@@ -549,8 +546,8 @@ public class ReflectUtil {
      * @return void
      */
     public static ReflectionResponse<Void> setFieldValue(Object object, Field field, Object newValue) {
-        Validate.notNull(field, "field cannot be null");
-        Validate.isTrue(object != null || Modifier.isStatic(field.getModifiers()), "object cannot be null");
+        assert field != null: "field cannot be null";
+        assert object != null || Modifier.isStatic(field.getModifiers()): "object cannot be null";
         try {
             field.set(object, newValue);
             return new ReflectionResponse<>((Void) null);
@@ -568,9 +565,9 @@ public class ReflectUtil {
      * @return the result of the method
      */
     public static ReflectionResponse<Object> invokeMethod(Object object, Method method, Object... params) {
-        Validate.notNull(method, "method cannot be null");
-        Validate.isTrue(object != null || Modifier.isStatic(method.getModifiers()), "object cannot be null");
-        Validate.notNull(params, "params cannot be null");
+        assert method != null: "method cannot be null";
+        assert object != null || Modifier.isStatic(method.getModifiers()): "object cannot be null";
+        assert params != null: "params cannot be null";
         try {
             return new ReflectionResponse<>(method.invoke(object, params));
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -587,8 +584,8 @@ public class ReflectUtil {
      * @return the newly instantiated object returned by the constructor
      */
     public static <T> ReflectionResponse<T> invokeConstructor(Constructor<T> constructor, Object... params) {
-        Validate.notNull(constructor, "constructor cannot be null");
-        Validate.notNull(params, "params cannot be null");
+        assert constructor != null: "constructor cannot be null";
+        assert params != null: "params cannot be null";
         try {
             return new ReflectionResponse<>(constructor.newInstance(params));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -631,12 +628,12 @@ public class ReflectUtil {
      * @return a Map keyed by the field name, and the value is the string representation of the object the field contains
      */
     public static ReflectionResponse<Map<String, String>> getPrintableFields(Object object, boolean useToString, Class<?>... toStringExceptions) {
-        Validate.notNull(object, "object cannot be null");
+        assert object != null: "object cannot be null";
         return getPrintableFields(object, object.getClass(), useToString, toStringExceptions);
     }
 
     public static ReflectionResponse<Map<String, String>> getPrintableFields(Object object, Class<?> clazz, boolean useToString, Class<?>... toStringExceptions) {
-        Validate.notNull(clazz, "clazz cannot be null");
+        assert clazz != null: "clazz cannot be null";
         Map<String, String> fields = Maps.newHashMap();
         try {
             for (Field field : clazz.getFields()) {
@@ -750,7 +747,7 @@ public class ReflectUtil {
                 return new ReflectionResponse<>(str.toString());
             }
             if (useToString) {
-                if (object.getClass().getMethod("toString").getDeclaringClass() != Object.class && !ArrayUtils.contains(toStringExceptions, object.getClass())) {
+                if (object.getClass().getMethod("toString").getDeclaringClass() != Object.class && !Arrays.asList(toStringExceptions).contains(object.getClass())) {
                     return new ReflectionResponse<>(object.toString());
                 } else {
                     ReflectionResponse<Map<String, String>> response = getPrintableFields(object, true, toStringExceptions);
@@ -761,7 +758,7 @@ public class ReflectUtil {
                     return new ReflectionResponse<>(object.getClass().getSimpleName() + response.getValue());
                 }
             } else {
-                if (ClassUtils.isPrimitiveWrapper(object.getClass()) || object instanceof String || object instanceof Enum || ArrayUtils.contains(toStringExceptions, object.getClass())) {
+                if (ClassUtils.isPrimitiveWrapper(object.getClass()) || object instanceof String || object instanceof Enum || Arrays.asList(toStringExceptions).contains(object.getClass())) {
                     // Even though useToString is false, we call toString on primitive wrappers, Strings, Enums and the specified exceptions.
                     return new ReflectionResponse<>(object.toString());
                 } else {
